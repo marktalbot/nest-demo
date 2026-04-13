@@ -27,10 +27,10 @@ export class Service {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string;
+  description: string | null;
 
   @Column({ nullable: true })
-  activeVersionId: string;
+  activeVersionId: string | null;
 
   @ManyToOne(() => ServiceVersion, { nullable: true, eager: false })
   @JoinColumn()
