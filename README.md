@@ -1,73 +1,80 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Service Catalog API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A multi-tenant REST API for managing a service catalog. Built with [NestJS v9](https://docs.nestjs.com/v9) and PostgreSQL via TypeORM.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Prerequisites
 
-## Description
+- [Docker](https://www.docker.com/) and Docker Compose
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Getting started
 
-## Installation
+1. Clone the repo
+2. Copy the example env file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Start the app and database:
+   ```bash
+   docker compose up --build
+   ```
 
+The app runs on `http://localhost:3000`. Migrations run automatically on startup.
+
+## Scripts
+
+**Development**
 ```bash
-$ npm install
+docker compose up --build       # start app + postgres
+docker compose rm -svf app      # stop and remove the app container
 ```
 
-## Running the app
-
+**Migrations**
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run migration:generate src/migrations/<Name>  # generate a migration from entity changes
+npm run migration:run                              # run pending migrations
+npm run migration:revert                           # revert the last migration
 ```
 
-## Test
-
+**Seed**
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run seed:local   # seed 1 org, 1 user, 10 services with versions (dev only)
 ```
 
-## Support
+**Tests**
+```bash
+npm run test         # unit tests
+npm run test:e2e     # end-to-end tests
+npm run test:cov     # test coverage
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## API endpoints
 
-## Stay in touch
+All routes are scoped to an organization. Replace `:orgId` and `:id` with UUIDs.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/organizations/:orgId/services` | List services (supports filtering, sorting, pagination) |
+| GET | `/organizations/:orgId/services/:id` | Get a single service |
+| GET | `/organizations/:orgId/services/:id/versions` | List versions for a service |
 
-## License
+**Query params for list endpoint**
 
-Nest is [MIT licensed](LICENSE).
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `search` | string | — | Filter by name (case-insensitive, partial match) |
+| `sortBy` | `name` \| `createdAt` | `name` | Field to sort by |
+| `sortOrder` | `asc` \| `desc` | `asc` | Sort direction |
+| `page` | number | `1` | Page number (1-indexed) |
+| `limit` | number | `20` | Page size (max 100) |
+
+**Example**
+```bash
+curl "http://localhost:3000/organizations/<orgId>/services?search=auth&sortBy=name&sortOrder=asc&page=1&limit=10"
+```
+
+## Resetting the database
+
+```bash
+docker compose exec postgres psql -U nest -d nest_demo -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
+docker compose rm -svf app && docker compose up --build
+```
