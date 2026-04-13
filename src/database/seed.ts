@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== 'development') {
 import { AppDataSource } from '../data-source';
 import { Organization } from '../modules/organizations/organization.entity';
 import { User } from '../modules/users/user.entity';
+import { UserOrganization } from '../modules/users/user-organization.entity';
 import { Service } from '../modules/services/service.entity';
 import { ServiceVersion } from '../modules/service-versions/service-version.entity';
 
@@ -33,6 +34,7 @@ async function seed() {
 
   const orgRepo = AppDataSource.getRepository(Organization);
   const userRepo = AppDataSource.getRepository(User);
+  const userOrgRepo = AppDataSource.getRepository(UserOrganization);
   const serviceRepo = AppDataSource.getRepository(Service);
   const versionRepo = AppDataSource.getRepository(ServiceVersion);
 
@@ -47,6 +49,7 @@ async function seed() {
       await serviceRepo.update(service.id, { activeVersionId: null });
     }
     await serviceRepo.delete({ organizationId: existingOrg.id });
+    await userOrgRepo.delete({ organizationId: existingOrg.id });
     await userRepo.delete({ email: 'seed@example.com' });
     await orgRepo.delete(existingOrg.id);
   }
@@ -55,12 +58,17 @@ async function seed() {
   const org = await orgRepo.save(orgRepo.create({ name: SEED_ORG_NAME }));
 
   // User
-  await userRepo.save(
+  const user = await userRepo.save(
     userRepo.create({
       name: 'Seed User',
       email: 'seed@example.com',
       password: 'hashed_password_placeholder',
     }),
+  );
+
+  // Link user to org
+  await userOrgRepo.save(
+    userOrgRepo.create({ userId: user.id, organizationId: org.id }),
   );
 
   // Services + versions

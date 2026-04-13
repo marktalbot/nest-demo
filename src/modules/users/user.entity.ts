@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { UserOrganization } from './user-organization.entity';
 
 @Entity('users')
 export class User {
@@ -19,6 +21,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToMany(() => UserOrganization, (uo) => uo.user)
+  memberships: UserOrganization[];
 
   @CreateDateColumn()
   createdAt: Date;
