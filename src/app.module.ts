@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { Organization } from './modules/organizations/organization.entity';
 import { ServiceVersionsModule } from './modules/service-versions/service-versions.module';
 import { ServiceVersion } from './modules/service-versions/service-version.entity';
@@ -22,7 +20,5 @@ import { UserOrganization } from './modules/users/user-organization.entity';
     ServicesModule,
     ServiceVersionsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
