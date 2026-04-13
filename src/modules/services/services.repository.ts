@@ -6,7 +6,9 @@ import { Service } from './service.entity';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ListServicesQueryDto } from './dto/list-services-query.dto';
-import { PaginatedServicesResponseDto } from './dto/service-response.dto';
+import { PaginatedServicesResponseDto, ServiceResponseDto } from './dto/service-response.dto';
+
+type ServiceWithCount = Service & { versionCount: number };
 
 /**
  * Error code that Postgres returns when violating a foreign key constraint
@@ -49,11 +51,24 @@ export class ServicesRepository {
 
     const [data, total] = await qb.getManyAndCount();
 
-    return { data: data as any, total, page, limit };
+    return { data: data as ServiceWithCount[], total, page, limit };
   }
 
   findByIdAndOrg(id: string, orgId: string): Promise<Service | null> {
     return this.repo.findOne({ where: { id, organizationId: orgId } });
+  }
+
+  async findByIdAndOrgWithCount(
+    id: string,
+    orgId: string,
+  ): Promise<ServiceResponseDto | null> {
+    const result = await this.repo
+      .createQueryBuilder('service')
+      .loadRelationCountAndMap('service.versionCount', 'service.versions')
+      .where('service.id = :id AND service.organizationId = :orgId', { id, orgId })
+      .getOne();
+
+    return result ? (result as ServiceWithCount) : null;
   }
 
   findVersionsByServiceId(

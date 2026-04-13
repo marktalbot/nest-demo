@@ -15,16 +15,6 @@ export class ServiceResponseDto {
   updatedAt: Date;
 }
 
-export class ServiceDetailResponseDto {
-  id: string;
-  organizationId: string;
-  name: string;
-  description: string | null;
-  activeVersionId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export class PaginatedServicesResponseDto {
   data: ServiceResponseDto[];
   total: number;

@@ -7,7 +7,7 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { ListServicesQueryDto } from './dto/list-services-query.dto';
 import {
   PaginatedServicesResponseDto,
-  ServiceDetailResponseDto,
+  ServiceResponseDto,
 } from './dto/service-response.dto';
 import { ServicesRepository } from './services.repository';
 
@@ -22,8 +22,8 @@ export class ServicesService {
     return this.servicesRepository.findPaginated(orgId, query);
   }
 
-  async findOne(orgId: string, id: string): Promise<ServiceDetailResponseDto> {
-    const service = await this.servicesRepository.findByIdAndOrg(id, orgId);
+  async findOne(orgId: string, id: string): Promise<ServiceResponseDto> {
+    const service = await this.servicesRepository.findByIdAndOrgWithCount(id, orgId);
     if (!service) {
       throw new NotFoundException(`Service ${id} not found`);
     }
