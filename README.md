@@ -2,6 +2,16 @@
 
 A multi-tenant REST API for managing a service catalog. Built with [NestJS v9](https://docs.nestjs.com/v9) and PostgreSQL via TypeORM.
 
+## Table of contents
+
+- [Prerequisites](#prerequisites)
+- [Getting started](#getting-started)
+- [Scripts](#scripts)
+- [API endpoints](#api-endpoints)
+- [Design tradeoffs](#design-tradeoffs)
+- [Assumptions](#assumptions)
+- [Resetting the database](#resetting-the-database)
+
 ## Prerequisites
 
 - [Docker](https://www.docker.com/) and Docker Compose
@@ -99,6 +109,26 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
   "limit": 10
 }
 ```
+
+## Design tradeoffs
+
+| Decision | Reasoning |
+|----------|-----------|
+| Active version stored as a FK on `services`, not a flag on `service_versions` | Enforces one active version per service at the schema level — only one slot exists. Alternative (`is_active` boolean) would need a partial unique index and app-level logic to unset the previous active version. Tradeoff: circular FK between the two tables, managed by making the column nullable. |
+| `organizationId` on every table | Keeps tenant-scoped queries simple without joins, even though the org is reachable via `serviceId → services.organizationId`. Risk of inconsistency if a service's org ever changes is accepted as low. |
+| Service versions are fetched via a separate endpoint, not included in the single service response | A service could accumulate many versions over time. Inlining them would make the payload unbounded. The dedicated `GET .../versions` endpoint can have pagination added independently if needed. |
+| camelCase column names | TypeORM's default convention, avoids adding a naming strategy dependency. Tradeoff: non-standard for Postgres — can be surprising when querying the DB directly. |
+
+## Assumptions
+
+- The API is read-only — no create/update/delete endpoints
+- The caller already knows the `orgId` — no endpoint exists to resolve it from a user
+- No authentication layer — org scoping is enforced by the URL param, not a token or session
+- A service belongs to exactly one organization — no cross-org sharing
+- Version names are free-form strings (e.g. `v1.0.0`) — no semver enforcement
+- A service can have at most one active version — `activeVersionId` is null until one is set
+- The `users` table exists for future auth but is not used by the current API
+- Passwords are not hashed in the seed — placeholder only, a real auth layer will handle hashing
 
 ## Resetting the database
 
