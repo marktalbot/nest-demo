@@ -79,6 +79,25 @@ All routes are scoped to an organization. Replace `:orgId` and `:id` with UUIDs.
 **Example**
 ```bash
 curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/services?search=auth&sortBy=name&sortOrder=asc&page=1&limit=10"
+
+// Sample response
+{
+  "data": [
+    {
+      "id": "035f3840-8e88-43a0-b1c4-319b77accca7",
+      "organizationId": "a0000000-0000-0000-0000-000000000001",
+      "name": "Authentication Service",
+      "description": "Description for Authentication Service",
+      "activeVersionId": "0ef94ea8-a659-4b29-8d82-ceda7c712755",
+      "createdAt": "2026-04-13T03:40:16.906Z",
+      "updatedAt": "2026-04-13T03:40:16.915Z",
+      "versionCount": 2
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 10
+}
 ```
 
 ## Resetting the database
