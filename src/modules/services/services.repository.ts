@@ -6,7 +6,10 @@ import { Service } from './service.entity';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ListServicesQueryDto } from './dto/list-services-query.dto';
-import { PaginatedServicesResponseDto, ServiceResponseDto } from './dto/service-response.dto';
+import {
+  PaginatedServicesResponseDto,
+  ServiceResponseDto,
+} from './dto/service-response.dto';
 
 type ServiceWithCount = Service & { versionCount: number };
 
