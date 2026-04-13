@@ -114,10 +114,10 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
 
 | Decision | Reasoning |
 |----------|-----------|
-| Active version stored as a FK on `services`, not a flag on `service_versions` | Enforces one active version per service at the schema level (because only one "slot" exists). Alternative (`is_active` boolean on the `service_versions` record) would need a partial unique index and app-level logic to unset the previous active version. Tradeoff: circular FK between the two tables, managed by making the column nullable. |
-| `organizationId` on every table | Keeps tenant-scoped queries simple without joins, even though the org is reachable via `serviceId → services.organizationId`. Tradeoff: risk of inconsistency if a service's org ever changes is accepted as low. |
-| Service versions are fetched via a separate endpoint, not included in the single service response | A service could accumulate many versions over time. Inlining them would make the payload unbounded. The dedicated `GET .../versions` endpoint can have pagination added independently if needed. Tradeoff: clients that need both the service detail and its versions must make two requests. |
-| camelCase column names | TypeORM's default convention, avoids adding a naming strategy dependency. Tradeoff: non-standard for Postgres — can be surprising when querying the DB directly. |
+| Active version stored as a FK on `services`, not a flag on `service_versions` | Enforces one active version per service at the schema level (because only one "slot" exists). Alternative (`is_active` boolean on the `service_versions` record) would need a partial unique index and app-level logic to unset the previous active version.<br><br>Tradeoff: circular FK between the two tables, managed by making the column nullable. |
+| `organizationId` on every table | Keeps tenant-scoped queries simple without joins, even though the org is reachable via `serviceId → services.organizationId`.<br><br>Tradeoff: risk of inconsistency if a service's org ever changes is accepted as low. |
+| Service versions are fetched via a separate endpoint, not included in the single service response | A service could accumulate many versions over time. Inlining them would make the payload unbounded. The dedicated `GET .../versions` endpoint can have pagination added independently if needed.<br><br>Tradeoff: clients that need both the service detail and its versions must make two requests. |
+| camelCase column names | TypeORM's default convention, avoids adding a naming strategy dependency.<br><br>Tradeoff: non-standard for Postgres — can be surprising when querying the DB directly. |
 
 ## Assumptions
 
