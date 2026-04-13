@@ -1,7 +1,6 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class UpdateServiceVersionDto {
-  @IsOptional()
   @IsString()
-  name?: string;
+  name: string;
 }
