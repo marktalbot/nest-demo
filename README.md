@@ -69,13 +69,26 @@ npm run test:cov     # test coverage
 
 ## API endpoints
 
-All routes are scoped to an organization. Replace `:orgId` and `:id` with UUIDs.
+All routes are scoped to an organization. Replace `:orgId`, `:id`, and `:versionId` with UUIDs.
+
+**Services**
 
 | Method | Route | Description |
 |--------|-------|-------------|
 | GET | `/organizations/:orgId/services` | List services (supports filtering, sorting, pagination) |
 | GET | `/organizations/:orgId/services/:id` | Get a single service |
+| POST | `/organizations/:orgId/services` | Create a service |
+| PATCH | `/organizations/:orgId/services/:id` | Update a service (name, description, activeVersionId) |
+| DELETE | `/organizations/:orgId/services/:id` | Delete a service and all its versions |
+
+**Service versions**
+
+| Method | Route | Description |
+|--------|-------|-------------|
 | GET | `/organizations/:orgId/services/:id/versions` | List versions for a service |
+| POST | `/organizations/:orgId/services/:id/versions` | Create a version |
+| PATCH | `/organizations/:orgId/services/:id/versions/:versionId` | Update a version's name |
+| DELETE | `/organizations/:orgId/services/:id/versions/:versionId` | Delete a version (clears activeVersionId if it was active) |
 
 **Query params for list endpoint**
 
@@ -135,6 +148,7 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
 
 - **Postgres Row Level Security (RLS):** for hard tenant isolation guarantees, RLS enforces org scoping at the database level regardless of application code. A session variable (`app.current_org_id`) is set before each query and Postgres automatically filters all reads/writes.
 - **Pagination on the versions endpoint:** `GET .../versions` currently returns all versions for a service. Adding `page`/`limit` params would be needed if services accumulate a large number of versions.
+- **Creation of Swagger API docs:** For improved developer experience when working with the API.
 
 ## Resetting the database
 
