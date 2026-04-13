@@ -13,7 +13,10 @@ export class ServiceVersionsService {
     serviceId: string,
     dto: CreateServiceVersionDto,
   ): Promise<ServiceVersion> {
-    const service = await this.servicesRepository.findByIdAndOrg(serviceId, orgId);
+    const service = await this.servicesRepository.findByIdAndOrg(
+      serviceId,
+      orgId,
+    );
     if (!service) {
       throw new NotFoundException(`Service ${serviceId} not found`);
     }
@@ -26,11 +29,20 @@ export class ServiceVersionsService {
     versionId: string,
     dto: UpdateServiceVersionDto,
   ): Promise<ServiceVersion> {
-    const version = await this.servicesRepository.findVersionById(versionId, serviceId, orgId);
+    const version = await this.servicesRepository.findVersionById(
+      versionId,
+      serviceId,
+      orgId,
+    );
     if (!version) {
       throw new NotFoundException(`Version ${versionId} not found`);
     }
-    return this.servicesRepository.updateVersion(versionId, serviceId, orgId, dto.name);
+    return this.servicesRepository.updateVersion(
+      versionId,
+      serviceId,
+      orgId,
+      dto.name,
+    );
   }
 
   async delete(
@@ -38,7 +50,11 @@ export class ServiceVersionsService {
     serviceId: string,
     versionId: string,
   ): Promise<void> {
-    const version = await this.servicesRepository.findVersionById(versionId, serviceId, orgId);
+    const version = await this.servicesRepository.findVersionById(
+      versionId,
+      serviceId,
+      orgId,
+    );
     if (!version) {
       throw new NotFoundException(`Version ${versionId} not found`);
     }
