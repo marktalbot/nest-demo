@@ -153,16 +153,17 @@ export class ServicesRepository {
     serviceId: string,
     orgId: string,
   ): Promise<void> {
-    const service = await this.repo.findOne({
-      where: { id: serviceId, organizationId: orgId },
-    });
-    if (service?.activeVersionId === versionId) {
-      await this.repo.update({ id: serviceId }, { activeVersionId: null });
-    }
-    await this.versionRepo.delete({
-      id: versionId,
-      serviceId,
-      organizationId: orgId,
+    await this.repo.manager.transaction(async (em) => {
+      await em.update(
+        Service,
+        { id: serviceId, organizationId: orgId, activeVersionId: versionId },
+        { activeVersionId: null },
+      );
+      await em.delete(ServiceVersion, {
+        id: versionId,
+        serviceId,
+        organizationId: orgId,
+      });
     });
   }
 }
