@@ -6,11 +6,11 @@ A multi-tenant REST API for managing a service catalog. Built with [NestJS v9](h
 
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
-- [Scripts](#scripts)
 - [API endpoints](#api-endpoints)
 - [Design tradeoffs](#design-tradeoffs)
 - [Assumptions](#assumptions)
 - [Future Improvements](#future-improvements)
+- [Scripts](#scripts)
 - [Resetting the database](#resetting-the-database)
 
 ## Prerequisites
@@ -39,33 +39,6 @@ The app runs on `http://localhost:3000`. Migrations run automatically on startup
    ```
    a0000000-0000-0000-0000-000000000001
    ```
-
-## Scripts
-
-**Development**
-```bash
-docker compose up --build       # start app + postgres
-docker compose rm -svf app      # stop and remove the app container
-```
-
-**Migrations**
-```bash
-npm run migration:generate src/migrations/<Name>  # generate a migration from entity changes
-npm run migration:run                              # run pending migrations
-npm run migration:revert                           # revert the last migration
-```
-
-**Seed**
-```bash
-npm run seed:local   # seed 1 org, 1 user, 10 services with versions (dev only)
-```
-
-**Tests**
-```bash
-npm run test         # unit tests
-npm run test:e2e     # end-to-end tests
-npm run test:cov     # test coverage
-```
 
 ## API endpoints
 
@@ -149,6 +122,33 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
 - **Postgres Row Level Security (RLS):** for hard tenant isolation guarantees, RLS enforces org scoping at the database level regardless of application code. A session variable (`app.current_org_id`) is set before each query and Postgres automatically filters all reads/writes.
 - **Pagination on the versions endpoint:** `GET .../versions` currently returns all versions for a service. Adding `page`/`limit` params would be needed if services accumulate a large number of versions.
 - **Creation of Swagger API docs:** For improved developer experience when working with the API.
+
+## Scripts
+
+**Development**
+```bash
+docker compose up --build       # start app + postgres
+docker compose rm -svf app      # stop and remove the app container
+```
+
+**Migrations**
+```bash
+npm run migration:generate src/migrations/<Name>  # generate a migration from entity changes
+npm run migration:run                              # run pending migrations
+npm run migration:revert                           # revert the last migration
+```
+
+**Seed**
+```bash
+npm run seed:local   # seed 1 org, 1 user, 10 services with versions (dev only)
+```
+
+**Tests**
+```bash
+npm run test         # unit tests
+npm run test:e2e     # end-to-end tests
+npm run test:cov     # test coverage
+```
 
 ## Resetting the database
 
