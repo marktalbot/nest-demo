@@ -105,10 +105,11 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
 | `organizationId` on every table | Keeps tenant-scoped queries simple without joins, even though the org is reachable via `serviceId → services.organizationId`.<br><br>Tradeoff: risk of inconsistency if a service's org ever changes is accepted as low. |
 | Service versions are fetched via a separate endpoint, not included in the single service response | A service could accumulate many versions over time. Inlining them would make the payload unbounded. The dedicated `GET .../versions` endpoint can have pagination added independently if needed.<br><br>Tradeoff: clients that need both the service detail and its versions must make two requests. |
 | camelCase column names | TypeORM's default convention, avoids adding a naming strategy dependency.<br><br>Tradeoff: non-standard for Postgres — can be surprising when querying the DB directly. |
+| No caching layer | A cache (e.g. Redis) would reduce database load for frequently read services, but adds operational complexity (cache invalidation on writes, an extra dependency to run and monitor). For a service catalog where data changes infrequently and the dataset per org is small, the database indexes are sufficient and the simpler path is preferable.<br><br>Tradeoff: repeated reads for the same org hit the database every time. Worth revisiting if read traffic grows significantly. |
+| Offset-based pagination (`page`/`limit`) over cursor-based | Simpler to implement and consume because clients can jump to any page and the query params are human-readable. Works well for a service catalog where the total number of services per org is expected to be modest.<br><br>Tradeoff: offset pagination degrades at high page numbers (Postgres must scan and discard all preceding rows) and can return duplicate or skipped rows if records are inserted or deleted between requests. Cursor-based pagination (e.g. keyed on `createdAt`/`id`) avoids both problems but removes the ability to jump to an arbitrary page and doesn't allow us to display the total number of pages (as depicted in the mockup UI). |
 
 ## Assumptions
 
-- The API is read-only — no create/update/delete endpoints
 - The caller already knows the `orgId` — no endpoint exists to resolve it from a user
 - No authentication layer — org scoping is enforced by the URL param, not a token or session
 - A service belongs to exactly one organization — no cross-org sharing
@@ -119,6 +120,7 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
 
 ## Future improvements
 
+- **Authentication and authorization:** Add a real auth layer (e.g. JWT-based) to replace the current honor-system org scoping. This would include password hashing, token issuance, and middleware to verify the caller's identity and confirm they belong to the `orgId` in the URL before any query runs.
 - **Postgres Row Level Security (RLS):** for hard tenant isolation guarantees, RLS enforces org scoping at the database level regardless of application code. A session variable (`app.current_org_id`) is set before each query and Postgres automatically filters all reads/writes.
 - **Pagination on the versions endpoint:** `GET .../versions` currently returns all versions for a service. Adding `page`/`limit` params would be needed if services accumulate a large number of versions.
 - **Creation of Swagger API docs:** For improved developer experience when working with the API.
