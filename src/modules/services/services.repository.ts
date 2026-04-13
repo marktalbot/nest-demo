@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ServiceVersion } from '../service-versions/service-version.entity';
@@ -7,6 +7,11 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ListServicesQueryDto } from './dto/list-services-query.dto';
 import { PaginatedServicesResponseDto } from './dto/service-response.dto';
+
+/**
+ * Error code that Postgres returns when violating a foreign key constraint
+ */
+const PG_FK_VIOLATION = '23503';
 
 @Injectable()
 export class ServicesRepository {
@@ -70,7 +75,14 @@ export class ServicesRepository {
     orgId: string,
     dto: UpdateServiceDto,
   ): Promise<Service> {
-    await this.repo.update({ id, organizationId: orgId }, dto);
+    try {
+      await this.repo.update({ id, organizationId: orgId }, dto);
+    } catch (err) {
+      if ((err as any)?.code === PG_FK_VIOLATION) {
+        throw new BadRequestException('Invalid activeVersionId');
+      }
+      throw err;
+    }
     return this.repo.findOne({ where: { id, organizationId: orgId } });
   }
 
