@@ -130,6 +130,11 @@ curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/s
 - The `users` table exists for future auth but is not used by the current API
 - Passwords are not hashed in the seed — placeholder only, a real auth layer will handle hashing
 
+## Future improvements
+
+- **Postgres Row Level Security (RLS)** — for hard tenant isolation guarantees, RLS enforces org scoping at the database level regardless of application code. A session variable (`app.current_org_id`) is set before each query and Postgres automatically filters all reads/writes. Even a raw query that forgets to include `orgId` will be restricted. This is the most bulletproof approach but requires auth to be in place first.
+- **Pagination on the versions endpoint** — `GET .../versions` currently returns all versions for a service. Adding `page`/`limit` params would be needed if services accumulate a large number of versions.
+
 ## Resetting the database
 
 ```bash
