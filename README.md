@@ -10,6 +10,7 @@ A multi-tenant REST API for managing a service catalog. Built with [NestJS v9](h
 - [API endpoints](#api-endpoints)
 - [Design tradeoffs](#design-tradeoffs)
 - [Assumptions](#assumptions)
+- [Future Improvements](#future-improvements)
 - [Resetting the database](#resetting-the-database)
 
 ## Prerequisites
