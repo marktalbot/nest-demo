@@ -4,6 +4,7 @@ import {
   Delete,
   HttpCode,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -17,8 +18,8 @@ export class ServiceVersionsController {
 
   @Post()
   create(
-    @Param('orgId') orgId: string,
-    @Param('serviceId') serviceId: string,
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('serviceId', ParseUUIDPipe) serviceId: string,
     @Body() dto: CreateServiceVersionDto,
   ) {
     return this.serviceVersionsService.create(orgId, serviceId, dto);
@@ -26,9 +27,9 @@ export class ServiceVersionsController {
 
   @Patch(':versionId')
   update(
-    @Param('orgId') orgId: string,
-    @Param('serviceId') serviceId: string,
-    @Param('versionId') versionId: string,
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('serviceId', ParseUUIDPipe) serviceId: string,
+    @Param('versionId', ParseUUIDPipe) versionId: string,
     @Body() dto: UpdateServiceVersionDto,
   ) {
     return this.serviceVersionsService.update(orgId, serviceId, versionId, dto);
@@ -37,9 +38,9 @@ export class ServiceVersionsController {
   @Delete(':versionId')
   @HttpCode(204)
   delete(
-    @Param('orgId') orgId: string,
-    @Param('serviceId') serviceId: string,
-    @Param('versionId') versionId: string,
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('serviceId', ParseUUIDPipe) serviceId: string,
+    @Param('versionId', ParseUUIDPipe) versionId: string,
   ) {
     return this.serviceVersionsService.delete(orgId, serviceId, versionId);
   }

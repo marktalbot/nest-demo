@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -19,29 +20,41 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
   @Get()
-  findAll(@Param('orgId') orgId: string, @Query() query: ListServicesQueryDto) {
+  findAll(
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Query() query: ListServicesQueryDto,
+  ) {
     return this.servicesService.findAll(orgId, query);
   }
 
   @Get(':id')
-  findOne(@Param('orgId') orgId: string, @Param('id') id: string) {
+  findOne(
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.servicesService.findOne(orgId, id);
   }
 
   @Get(':id/versions')
-  findVersions(@Param('orgId') orgId: string, @Param('id') id: string) {
+  findVersions(
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.servicesService.findVersions(orgId, id);
   }
 
   @Post()
-  create(@Param('orgId') orgId: string, @Body() dto: CreateServiceDto) {
+  create(
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Body() dto: CreateServiceDto,
+  ) {
     return this.servicesService.create(orgId, dto);
   }
 
   @Patch(':id')
   update(
-    @Param('orgId') orgId: string,
-    @Param('id') id: string,
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateServiceDto,
   ) {
     return this.servicesService.update(orgId, id, dto);
@@ -49,7 +62,10 @@ export class ServicesController {
 
   @Delete(':id')
   @HttpCode(204)
-  delete(@Param('orgId') orgId: string, @Param('id') id: string) {
+  delete(
+    @Param('orgId', ParseUUIDPipe) orgId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.servicesService.delete(orgId, id);
   }
 }
