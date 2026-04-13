@@ -87,12 +87,11 @@ export class ServicesRepository {
   }
 
   async deleteService(id: string, orgId: string): Promise<void> {
-    await this.repo.update(
-      { id, organizationId: orgId },
-      { activeVersionId: null },
-    );
-    await this.versionRepo.delete({ serviceId: id, organizationId: orgId });
-    await this.repo.delete({ id, organizationId: orgId });
+    await this.repo.manager.transaction(async (em) => {
+      await em.update(Service, { id, organizationId: orgId }, { activeVersionId: null });
+      await em.delete(ServiceVersion, { serviceId: id, organizationId: orgId });
+      await em.delete(Service, { id, organizationId: orgId });
+    });
   }
 
   findVersionById(
