@@ -20,6 +20,15 @@ A multi-tenant REST API for managing a service catalog. Built with [NestJS v9](h
 
 The app runs on `http://localhost:3000`. Migrations run automatically on startup.
 
+4. Seed the database:
+   ```bash
+   npm run seed:local
+   ```
+   This creates a seed organization with a fixed ID you can use straight away:
+   ```
+   a0000000-0000-0000-0000-000000000001
+   ```
+
 ## Scripts
 
 **Development**
@@ -69,7 +78,7 @@ All routes are scoped to an organization. Replace `:orgId` and `:id` with UUIDs.
 
 **Example**
 ```bash
-curl "http://localhost:3000/organizations/<orgId>/services?search=auth&sortBy=name&sortOrder=asc&page=1&limit=10"
+curl "http://localhost:3000/organizations/a0000000-0000-0000-0000-000000000001/services?search=auth&sortBy=name&sortOrder=asc&page=1&limit=10"
 ```
 
 ## Resetting the database

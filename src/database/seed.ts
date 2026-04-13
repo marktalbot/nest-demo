@@ -15,6 +15,7 @@ import { Service } from '../modules/services/service.entity';
 import { ServiceVersion } from '../modules/service-versions/service-version.entity';
 
 const SEED_ORG_NAME = 'Seed Organization';
+const SEED_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
 
 const SERVICE_NAMES = [
   'Authentication Service',
@@ -55,7 +56,9 @@ async function seed() {
   }
 
   // Organization
-  const org = await orgRepo.save(orgRepo.create({ name: SEED_ORG_NAME }));
+  const org = await orgRepo.save(
+    orgRepo.create({ id: SEED_ORG_ID, name: SEED_ORG_NAME }),
+  );
 
   // User
   const user = await userRepo.save(
@@ -98,7 +101,6 @@ async function seed() {
   }
 
   console.log(`Seeded: 1 org, 1 user, ${SERVICE_NAMES.length} services`);
-  console.log(`Organization ID: ${org.id}`);
 
   await AppDataSource.destroy();
 }
